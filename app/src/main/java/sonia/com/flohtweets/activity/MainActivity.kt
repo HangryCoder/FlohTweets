@@ -11,7 +11,6 @@ import sonia.com.flohtweets.utils.VerticalItemDecoration
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var layoutManager: LinearLayoutManager
     private var tweetsList: ArrayList<Tweets> = ArrayList()
     private lateinit var tweetsAdapter: TweetsAdapter
 
@@ -25,8 +24,6 @@ class MainActivity : AppCompatActivity() {
             context = this@MainActivity,
             tweetsList = tweetsList
         )
-        layoutManager = LinearLayoutManager(this@MainActivity)
-        tweetsRecyclerView.layoutManager = layoutManager
         tweetsRecyclerView.addItemDecoration(VerticalItemDecoration(10))
 
         tweetsRecyclerView.adapter = tweetsAdapter
