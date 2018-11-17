@@ -21,5 +21,11 @@ class Constants {
         const val CONTENT_TYPE = "application/json"
 
         const val GRANT_TYPE: String = "client_credentials"
+
+        //API Call
+
+        const val TWEET_NAME = "FlohNetwork"
+
+        const val TWEET_COUNT = 5
     }
 }
