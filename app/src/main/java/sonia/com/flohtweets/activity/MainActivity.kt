@@ -1,7 +1,8 @@
-package sonia.com.flohtweets
+package sonia.com.flohtweets.activity
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import sonia.com.flohtweets.R
 
 class MainActivity : AppCompatActivity() {
 
