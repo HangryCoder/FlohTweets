@@ -27,6 +27,8 @@ android {
 def sdkVersion = "28.0.0"
 def glideVersion = "4.8.0"
 def circleImageViewVersion = "2.2.0"
+def retrofitVersion = "2.4.0"
+def okHttpVersion = "3.12.0"
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -44,4 +46,18 @@ dependencies {
     //Glide
     implementation "com.github.bumptech.glide:glide:$glideVersion"
     kapt "com.github.bumptech.glide:compiler:$glideVersion"
+    //Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    //OkHttp
+    implementation "com.squareup.okhttp3:okhttp:$okHttpVersion"
+    //HttpLoggingInterceptor
+    implementation "com.squareup.okhttp3:logging-interceptor:$okHttpVersion"
+    //Gson
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+    //RxJava Adapter
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
+    //RxJava
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.0'
+    //RxAndroid
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 }
