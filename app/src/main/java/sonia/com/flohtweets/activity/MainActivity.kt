@@ -40,22 +40,18 @@ class MainActivity : AppCompatActivity() {
             header = "Basic dHp0TEVFYWRYamNwU0U0NWxBUkxiQ3F4Rzp1ZGlkNFpIZWxmODE2Z1lTQ1VyMW16bmx2VzRLdkl6" +
                     "dXhtaXNoR0hBUlVzaFZqRUt3WA==",
             grantType = Constants.GRANT_TYPE
-        ).subscribeOn(Schedulers.io())
+        ).flatMap { twitterToken ->
+            return@flatMap RestClient.getTweetAPI().getFlohTweets(
+                tweetName = "nasa",
+                resultType = "popular",
+                count = 5,
+                header = "${twitterToken.token_type} ${twitterToken.access_token}",
+                contentType = Constants.CONTENT_TYPE
+            )
+        }
+            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-
-            }
-
-        RestClient.getTweetAPI().getFlohTweets(
-            tweetName = "nasa",
-            resultType = "popular",
-            count = 5,
-            header = "Bearer AAAAAAAAAAAAAAAAAAAAAKqy8wAAAAAAZbaTrRDd1t%2FYUybanASNr3W2%2B2s%3DhkIq21jrT9zbzViaEgxsap2D1J2nlHgUlTtzl41po3egIhaon2",
-            contentType = Constants.CONTENT_TYPE
-        ).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-
+            .subscribe { success ->
             }
     }
 
