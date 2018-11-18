@@ -2,6 +2,7 @@ package sonia.com.flohtweets.activity
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -16,29 +17,34 @@ import sonia.com.flohtweets.utils.Base64Encoding
 import sonia.com.flohtweets.utils.Constants
 import sonia.com.flohtweets.utils.VerticalItemDecoration
 import sonia.com.flohtweets.utils.showLogE
-import java.util.*
+import kotlin.collections.ArrayList
+
 
 class MainActivity : AppCompatActivity() {
-
-    private var tweetsList: ArrayList<Tweets> = ArrayList()
-    private lateinit var tweetsAdapter: TweetsAdapter
-
-    private var disposable: Disposable? = null
-
-    private var loading = true
-    private var pastVisibleItems: Int = 0
-    private var visibleItemCount: Int = 0
-    private var totalItemCount: Int = 0
 
     private val TAG by lazy {
         MainActivity::class.java.simpleName
     }
+
+    private var tweetsList: ArrayList<Tweets?> = ArrayList()
+    private lateinit var tweetsAdapter: TweetsAdapter
+
+    private var disposable: Disposable? = null
+
+    private var loading = false
+    private var pastVisibleItems: Int = 0
+    private var visibleItemCount: Int = 0
+    private var totalItemCount: Int = 0
+
+    private var handler: Handler? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         fetchTweets()
+
+        handler = Handler()
 
         tweetsAdapter = TweetsAdapter(
             context = this@MainActivity,
@@ -53,7 +59,7 @@ class MainActivity : AppCompatActivity() {
             fetchFlohTweets()
         }
 
-        // endlessScrolling()
+        endlessScrolling()
     }
 
     private fun endlessScrolling() {
@@ -68,11 +74,25 @@ class MainActivity : AppCompatActivity() {
                     totalItemCount = layoutManager.itemCount
                     pastVisibleItems = layoutManager.findFirstVisibleItemPosition()
 
-                    if (loading) {
+                    if (!loading) {
                         if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
-                            loading = false
+                            loading = true
                             showLogE(TAG, message = "Last Item Wow !")
                             //Do pagination.. i.e. fetch new data
+
+                            //add null , so the adapter will check view_type and show progress bar at bottom
+                            tweetsList.add(null)
+                            tweetsAdapter.notifyItemInserted(tweetsList.size - 1)
+
+                            handler?.postDelayed({
+                                //   remove progress item
+                                tweetsList.removeAt(tweetsList.size - 1)
+                                tweetsAdapter.notifyItemRemoved(tweetsList.size)
+
+                                fetchTweets()
+                                tweetsAdapter.notifyItemInserted(tweetsList.size)
+                                loading = false
+                            }, Constants.ENDLESS_SCROLL_DELAY)
                         }
                     }
                 }
@@ -135,13 +155,6 @@ class MainActivity : AppCompatActivity() {
         tweets = Tweets(
             tweetId = 1, tweetUsername = "Shilpa Wadji",
             tweetUserProfile = "dfvfv", tweetMessage = ""
-        )
-        tweetsList.add(tweets)
-
-        tweets = Tweets(
-            tweetId = 1, tweetUsername = "Shilpa Wadji",
-            tweetUserProfile = "dfvfv", tweetMessage = "",
-            tweetType = Constants.LOAD_MORE_ITEM
         )
         tweetsList.add(tweets)
     }

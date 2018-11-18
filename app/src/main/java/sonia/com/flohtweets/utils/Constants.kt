@@ -8,6 +8,8 @@ class Constants {
 
         const val CONSUMER_SECRET = "udid4ZHelf816gYSCUr1mznlvW4KvIzuxmishGHARUshVjEKwX"
 
+        const val ENDLESS_SCROLL_DELAY = 2000L
+
         //Retrofit
 
         const val MAIN_URL = "https://api.twitter.com/"

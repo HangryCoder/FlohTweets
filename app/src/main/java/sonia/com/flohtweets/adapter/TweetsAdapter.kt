@@ -6,8 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
-import kotlinx.android.synthetic.main.layout_load_more.view.*
 import sonia.com.flohtweets.R
 import sonia.com.flohtweets.model.Tweets
 import kotlinx.android.synthetic.main.layout_tweet.view.*
@@ -15,7 +13,7 @@ import sonia.com.flohtweets.utils.Constants
 
 class TweetsAdapter(
     private val context: Context,
-    private val tweetsList: ArrayList<Tweets>
+    private val tweetsList: ArrayList<Tweets?>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(container: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -42,7 +40,7 @@ class TweetsAdapter(
                     .load(/*tweets.tweetUserProfile*/context.resources.getDrawable(R.drawable.ic_launcher_background))
                     .into(viewHolder.itemView.tweetUserProfile)
 
-                viewHolder.itemView.tweetUsername.text = tweets.tweetUsername
+                viewHolder.itemView.tweetUsername.text = tweets?.tweetUsername
                 //viewHolder.itemView.tweetMessage.text = tweets.tweetMessage
             }
             else -> {
@@ -56,7 +54,7 @@ class TweetsAdapter(
 
     override fun getItemViewType(position: Int): Int {
         super.getItemViewType(position)
-        return if (tweetsList[position].tweetType == Constants.TWEET_ITEM) {
+        return if (tweetsList[position] != null) {
             Constants.TWEET_ITEM
         } else {
             Constants.LOAD_MORE_ITEM
