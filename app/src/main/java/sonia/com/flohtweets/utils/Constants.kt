@@ -27,5 +27,11 @@ class Constants {
         const val TWEET_NAME = "FlohNetwork"
 
         const val TWEET_COUNT = 5
+
+        //Tweets Adapter
+
+        const val LOAD_MORE_ITEM = 0
+
+        const val TWEET_ITEM = 1
     }
 }
