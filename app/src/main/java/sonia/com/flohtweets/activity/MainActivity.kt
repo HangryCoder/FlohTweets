@@ -13,10 +13,7 @@ import sonia.com.flohtweets.R
 import sonia.com.flohtweets.network.RestClient
 import sonia.com.flohtweets.adapter.TweetsAdapter
 import sonia.com.flohtweets.model.Tweets
-import sonia.com.flohtweets.utils.Base64Encoding
-import sonia.com.flohtweets.utils.Constants
-import sonia.com.flohtweets.utils.VerticalItemDecoration
-import sonia.com.flohtweets.utils.showLogE
+import sonia.com.flohtweets.utils.*
 import kotlin.collections.ArrayList
 
 
@@ -78,9 +75,7 @@ class MainActivity : AppCompatActivity() {
                         if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
                             loading = true
                             showLogE(TAG, message = "Last Item Wow !")
-                            //Do pagination.. i.e. fetch new data
 
-                            //add null , so the adapter will check view_type and show progress bar at bottom
                             tweetsList.add(null)
                             tweetsAdapter.notifyItemInserted(tweetsList.size - 1)
 
