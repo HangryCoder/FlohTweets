@@ -31,6 +31,7 @@ def retrofitVersion = "2.4.0"
 def okHttpVersion = "3.12.0"
 def rxJavaVersion = "2.2.0"
 def rxAndroidVersion = "2.1.0"
+def roundedImageViewVersion = "2.3.0"
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

@@ -2,4 +2,6 @@
 <resources>
     <dimen name="tweetUsernameSize">16sp</dimen>
     <dimen name="tweetMessageSize">14sp</dimen>
+    <dimen name="tweetUserProfileSize">60dp</dimen>
+    <dimen name="tweetScreenNameSize">13sp</dimen>
 </resources>

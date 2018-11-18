@@ -40,7 +40,8 @@ class TweetsAdapter(
                     .load(tweets?.twitterUser?.userProfileURL)
                     .into(viewHolder.itemView.tweetUserProfile)
 
-                viewHolder.itemView.tweetUsername.text = tweets?.twitterUser?.userName
+                viewHolder.itemView.tweetUsername.text = tweets?.twitterUser?.name
+                viewHolder.itemView.tweetScreename.text = "@${tweets?.twitterUser?.userName}"
                 viewHolder.itemView.tweetMessage.text = tweets?.tweetMessage
             }
             else -> {
