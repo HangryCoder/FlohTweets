@@ -23,6 +23,16 @@ class TweetsAdapter(
 
     override fun getItemCount(): Int = tweetsList.size
 
+    fun clear() {
+        tweetsList.clear()
+        notifyDataSetChanged()
+    }
+
+    fun addAll(freshTweetsList: List<Tweets>) {
+        this.tweetsList.addAll(freshTweetsList)
+        notifyDataSetChanged()
+    }
+
     override fun onBindViewHolder(p0: TweetsHolder, p1: Int) {
         val tweets = tweetsList[p1]
 

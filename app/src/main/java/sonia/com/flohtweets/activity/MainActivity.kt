@@ -36,6 +36,13 @@ class MainActivity : AppCompatActivity() {
 
         tweetsRecyclerView.adapter = tweetsAdapter
 
+        swipeRefreshLayout.setColorSchemeColors(resources.getColor(R.color.colorPrimary))
+        swipeRefreshLayout.setOnRefreshListener {
+            fetchFlohTweets()
+        }
+    }
+
+    private fun fetchFlohTweets() {
         val encodedKey = Base64Encoding.encodeStringToBase64(
             key =
             Constants.CONSUMER_KEY + ":" + Constants.CONSUMER_SECRET
@@ -54,8 +61,12 @@ class MainActivity : AppCompatActivity() {
         }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { success ->
+            .doAfterTerminate {
+                swipeRefreshLayout.isRefreshing = false
             }
+            .subscribe({ success ->
+
+            }, { error -> })
     }
 
     private fun fetchTweets() {
