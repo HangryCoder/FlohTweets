@@ -170,31 +170,6 @@ class MainActivity : AppCompatActivity() {
             })
     }
 
-    private fun fetchFlohMentions() {
-        val encodedKey = Base64Encoding.encodeStringToBase64(
-            key =
-            Constants.CONSUMER_KEY + ":" + Constants.CONSUMER_SECRET
-        )
-
-        disposable = RestClient.getTweetAPI().getAuthToken(
-            header = "Basic $encodedKey",
-            grantType = Constants.GRANT_TYPE
-        ).flatMap { twitterToken ->
-            return@flatMap RestClient.getTweetAPI().getFlowMentions(
-                header = "${twitterToken.token_type} ${twitterToken.access_token}",
-                contentType = Constants.CONTENT_TYPE
-            )
-        }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doAfterTerminate {
-                // swipeRefreshLayout.isRefreshing = false
-            }
-            .subscribe({ success ->
-
-            }, { error -> })
-    }
-
     override fun onDestroy() {
         super.onDestroy()
 

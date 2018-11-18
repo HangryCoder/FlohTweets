@@ -32,10 +32,4 @@ interface TweetAPI {
         @Header("Content-Type") contentType: String
     ): Single<TwitterAPIResponse>
 
-    @GET(Constants.TWEETS_MENTIONS_API)
-    fun getFlowMentions(
-        @Header("Authorization") header: String,
-        @Header("Content-Type") contentType: String
-    ): Single<ResponseBody>
-
 }
