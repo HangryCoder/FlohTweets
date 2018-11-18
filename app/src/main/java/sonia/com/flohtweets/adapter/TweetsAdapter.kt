@@ -7,13 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import sonia.com.flohtweets.R
-import sonia.com.flohtweets.model.Tweets
 import kotlinx.android.synthetic.main.layout_tweet.view.*
+import sonia.com.flohtweets.model.Statuses
 import sonia.com.flohtweets.utils.Constants
 
 class TweetsAdapter(
     private val context: Context,
-    private val tweetsList: ArrayList<Tweets?>
+    private val tweetsList: ArrayList<Statuses?>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(container: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -37,11 +37,11 @@ class TweetsAdapter(
 
                 val tweets = tweetsList[position]
                 Glide.with(context)
-                    .load(/*tweets.tweetUserProfile*/context.resources.getDrawable(R.drawable.ic_launcher_background))
+                    .load(tweets?.twitterUser?.userProfileURL)
                     .into(viewHolder.itemView.tweetUserProfile)
 
-                viewHolder.itemView.tweetUsername.text = tweets?.tweetUsername
-                //viewHolder.itemView.tweetMessage.text = tweets.tweetMessage
+                viewHolder.itemView.tweetUsername.text = tweets?.twitterUser?.userName
+                viewHolder.itemView.tweetMessage.text = tweets?.tweetMessage
             }
             else -> {
                 //(viewHolder as LoadMoreHolder).itemView.loadMoreProgressBar
@@ -66,7 +66,8 @@ class TweetsAdapter(
         notifyDataSetChanged()
     }
 
-    fun addAll(freshTweetsList: List<Tweets>) {
+    fun addAll(freshTweetsList: List<Statuses>) {
+        tweetsList.clear()
         this.tweetsList.addAll(freshTweetsList)
         notifyDataSetChanged()
     }

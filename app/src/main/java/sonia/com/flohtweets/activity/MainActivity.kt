@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import sonia.com.flohtweets.R
 import sonia.com.flohtweets.network.RestClient
 import sonia.com.flohtweets.adapter.TweetsAdapter
-import sonia.com.flohtweets.model.Tweets
+import sonia.com.flohtweets.model.Statuses
 import sonia.com.flohtweets.utils.*
 import kotlin.collections.ArrayList
 
@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         MainActivity::class.java.simpleName
     }
 
-    private var tweetsList: ArrayList<Tweets?> = ArrayList()
+    private var tweetsList: ArrayList<Statuses?> = ArrayList()
     private lateinit var tweetsAdapter: TweetsAdapter
 
     private var disposable: Disposable? = null
@@ -38,8 +38,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        fetchTweets()
 
         handler = Handler()
 
@@ -57,6 +55,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         endlessScrolling()
+
+        fetchFlohTweets()
     }
 
     private fun endlessScrolling() {
@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
                                 tweetsList.removeAt(tweetsList.size - 1)
                                 tweetsAdapter.notifyItemRemoved(tweetsList.size)
 
-                                fetchTweets()
+                                // fetchTweets()
                                 tweetsAdapter.notifyItemInserted(tweetsList.size)
                                 loading = false
                             }, Constants.ENDLESS_SCROLL_DELAY)
@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
         ).flatMap { twitterToken ->
             return@flatMap RestClient.getTweetAPI().getFlohTweets(
                 tweetName = Constants.TWEET_NAME,
-                count = Constants.TWEET_COUNT,
+                /* count = Constants.TWEET_COUNT,*/
                 header = "${twitterToken.token_type} ${twitterToken.access_token}",
                 contentType = Constants.CONTENT_TYPE
             )
@@ -118,40 +118,35 @@ class MainActivity : AppCompatActivity() {
                 swipeRefreshLayout.isRefreshing = false
             }
             .subscribe({ success ->
+                val statuses = success.statuses
+                tweetsAdapter.addAll(statuses)
 
             }, { error -> })
     }
 
-    private fun fetchTweets() {
-        var tweets = Tweets(
-            tweetId = 1, tweetUsername = "Sonia Wadji",
-            tweetUserProfile = "dfvfv", tweetMessage = ""
+    private fun fetchFlohMentions() {
+        val encodedKey = Base64Encoding.encodeStringToBase64(
+            key =
+            Constants.CONSUMER_KEY + ":" + Constants.CONSUMER_SECRET
         )
-        tweetsList.add(tweets)
 
-        tweets = Tweets(
-            tweetId = 2, tweetUsername = "Stephen D'Souza",
-            tweetUserProfile = "dfvfv", tweetMessage = ""
-        )
-        tweetsList.add(tweets)
+        disposable = RestClient.getTweetAPI().getAuthToken(
+            header = "Basic $encodedKey",
+            grantType = Constants.GRANT_TYPE
+        ).flatMap { twitterToken ->
+            return@flatMap RestClient.getTweetAPI().getFlowMentions(
+                header = "${twitterToken.token_type} ${twitterToken.access_token}",
+                contentType = Constants.CONTENT_TYPE
+            )
+        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doAfterTerminate {
+                // swipeRefreshLayout.isRefreshing = false
+            }
+            .subscribe({ success ->
 
-        tweets = Tweets(
-            tweetId = 3, tweetUsername = "Krupa Bhat",
-            tweetUserProfile = "dfvfv", tweetMessage = ""
-        )
-        tweetsList.add(tweets)
-
-        tweets = Tweets(
-            tweetId = 4, tweetUsername = "Suhail Shaikh",
-            tweetUserProfile = "dfvfv", tweetMessage = ""
-        )
-        tweetsList.add(tweets)
-
-        tweets = Tweets(
-            tweetId = 1, tweetUsername = "Shilpa Wadji",
-            tweetUserProfile = "dfvfv", tweetMessage = ""
-        )
-        tweetsList.add(tweets)
+            }, { error -> })
     }
 
     override fun onDestroy() {

@@ -4,6 +4,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.http.*
+import sonia.com.flohtweets.model.TwitterAPIResponse
 import sonia.com.flohtweets.model.TwitterToken
 import sonia.com.flohtweets.utils.Constants
 
@@ -19,7 +20,13 @@ interface TweetAPI {
     @GET(Constants.TWEETS_API)
     fun getFlohTweets(
         @Query("q") tweetName: String,
-        @Query("count") count: Int,
+       /* @Query("count") count: Int,*/
+        @Header("Authorization") header: String,
+        @Header("Content-Type") contentType: String
+    ): Single<TwitterAPIResponse>
+
+    @GET(Constants.TWEETS_MENTIONS_API)
+    fun getFlowMentions(
         @Header("Authorization") header: String,
         @Header("Content-Type") contentType: String
     ): Single<ResponseBody>
