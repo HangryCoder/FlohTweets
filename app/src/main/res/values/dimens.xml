@@ -4,4 +4,6 @@
     <dimen name="tweetMessageSize">14sp</dimen>
     <dimen name="tweetUserProfileSize">60dp</dimen>
     <dimen name="tweetScreenNameSize">13sp</dimen>
+    <dimen name="collapsibleToolbarSize">200dp</dimen>
+    <dimen name="toolbarTextSize">19sp</dimen>
 </resources>

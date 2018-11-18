@@ -65,5 +65,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
     //SwipeRefreshLayout
     implementation "com.android.support:support-v4:$sdkVersion"
+    //Design
+    implementation "com.android.support:design:$sdkVersion"
 
 }
