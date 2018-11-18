@@ -6,10 +6,12 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.View
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.layout_loading.*
 import sonia.com.flohtweets.R
 import sonia.com.flohtweets.network.RestClient
 import sonia.com.flohtweets.adapter.TweetsAdapter
@@ -92,6 +94,10 @@ class MainActivity : AppCompatActivity() {
                                     loadMoreFlohTweets(nextResultsUrl)
                                 } else {
                                     hideProgressBarAndResetLoadingFlag()
+                                    showToast(
+                                        context = this@MainActivity,
+                                        message = resources.getString(R.string.no_more_tweets)
+                                    )
                                 }
                             }, Constants.ENDLESS_SCROLL_DELAY)
                         }
@@ -136,9 +142,26 @@ class MainActivity : AppCompatActivity() {
                 nextResultsUrl = twitterResponse.search_metadata.nextResultUrl
                 tweetsAdapter.addAll(tweets)
 
+                showTweetsList()
+
             }, { error ->
                 showLogE(TAG, "Error ${error.printStackTrace()}")
+
+                showErrorMessage()
+
             })
+    }
+
+    private fun showTweetsList() {
+        loadingLayout.visibility = View.INVISIBLE
+        swipeRefreshLayout.visibility = View.VISIBLE
+    }
+
+    private fun showErrorMessage() {
+        swipeRefreshLayout.visibility = View.INVISIBLE
+        loadingLayout.visibility = View.VISIBLE
+        progressBar.visibility = View.INVISIBLE
+        loadingPleaseWaitText.text = resources.getString(R.string.no_internet_connection)
     }
 
     private fun loadMoreFlohTweets(remainingUrl: String) {
@@ -172,6 +195,7 @@ class MainActivity : AppCompatActivity() {
             }, { error ->
                 showLogE(TAG, "Error ${error.printStackTrace()}")
                 hideProgressBarAndResetLoadingFlag()
+                showToast(context = this@MainActivity, message = resources.getString(R.string.no_more_tweets))
             })
     }
 

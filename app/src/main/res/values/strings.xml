@@ -2,4 +2,7 @@
     <string name="app_name">Floh Mentions</string>
     <string name="tweetDefaultMessage">
         <![CDATA[Keep calm & carry on is the perfect mantra to have when you are in the dating game. It can help in avoiding a lot of unsavoury situations. Read more about it here : https://buff.ly/2B6LvUM  #Floh #FlohNetwork #SingleInTheCity #SinglesCommunity #DatingApp #DatingAdvice #DatingTips]]></string>
+    <string name="loading_please_wait">Loading, Please wait...</string>
+    <string name="no_internet_connection">No Internet Connection</string>
+    <string name="no_more_tweets">No more tweets</string>
 </resources>

@@ -6,4 +6,5 @@
     <dimen name="tweetScreenNameSize">13sp</dimen>
     <dimen name="collapsibleToolbarSize">200dp</dimen>
     <dimen name="toolbarTextSize">19sp</dimen>
+    <dimen name="loadingTextSize">17sp</dimen>
 </resources>
