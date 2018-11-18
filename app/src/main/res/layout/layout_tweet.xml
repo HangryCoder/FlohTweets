@@ -10,11 +10,11 @@
                                                   android:layout_height="@dimen/tweetUserProfileSize"
                                                   tools:src="@tools:sample/avatars"
                                                   android:id="@+id/tweetUserProfile"
-                                                  android:layout_marginTop="8dp"
+                                                  android:layout_marginTop="20dp"
                                                   app:layout_constraintTop_toTopOf="parent"
                                                   app:layout_constraintStart_toStartOf="parent"
-                                                  android:layout_marginStart="10dp"
-                                                  android:layout_marginLeft="10dp"/>
+                                                  android:layout_marginStart="18dp"
+                                                  android:layout_marginLeft="18dp"/>
 
     <TextView
             tools:text="Sonia Wadji"
@@ -28,8 +28,8 @@
             app:layout_constraintStart_toEndOf="@+id/tweetUserProfile"
             android:layout_marginStart="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="10dp"
-            app:layout_constraintBottom_toBottomOf="@+id/tweetUserProfile"/>
+            android:layout_marginEnd="18dp"
+    />
 
     <TextView
             tools:text="s_wadji"
@@ -50,7 +50,7 @@
             android:textSize="@dimen/tweetMessageSize"
             android:fontFamily="@font/montserratregular"
             android:textColor="@color/tweetMessageColor"
-            android:lineSpacingExtra="4sp"
+            android:lineSpacingExtra="6sp"
             android:text="@string/tweetDefaultMessage"
             tools:text="@string/tweetDefaultMessage"
             android:layout_marginTop="8dp"
@@ -61,11 +61,17 @@
     <View android:layout_width="0dp"
           android:layout_height="0.5dp"
           android:id="@+id/divider"
-          android:layout_marginTop="10dp"
+          android:layout_marginTop="20dp"
           app:layout_constraintBottom_toBottomOf="parent"
           app:layout_constraintTop_toBottomOf="@+id/tweetMessage"
           app:layout_constraintStart_toStartOf="@+id/tweetUserProfile"
-          app:layout_constraintEnd_toEndOf="@+id/tweetUsername"
+          app:layout_constraintEnd_toEndOf="parent"
           android:background="@color/dividerColor"/>
+
+    <android.support.constraint.Group android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                      android:id="@+id/group2"
+                                      app:layout_constraintBottom_toBottomOf="@id/tweetUserProfile"
+                                      app:layout_constraintTop_toTopOf="@id/tweetUserProfile"
+                                      app:constraint_referenced_ids="tweetUsername,tweetScreename"/>
 
 </android.support.constraint.ConstraintLayout>
