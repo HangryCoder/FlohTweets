@@ -35,6 +35,8 @@ class MainActivity : AppCompatActivity() {
 
     private var handler: Handler? = null
 
+    private var nextResultsUrl = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -74,25 +76,31 @@ class MainActivity : AppCompatActivity() {
                     if (!loading) {
                         if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
                             loading = true
-                            showLogE(TAG, message = "Last Item Wow !")
+                            showLogE(TAG, message = "Last Item Wow ! $nextResultsUrl")
 
                             tweetsList.add(null)
                             tweetsAdapter.notifyItemInserted(tweetsList.size - 1)
 
                             handler?.postDelayed({
-                                //   remove progress item
-                                tweetsList.removeAt(tweetsList.size - 1)
-                                tweetsAdapter.notifyItemRemoved(tweetsList.size)
 
-                                // fetchTweets()
-                                tweetsAdapter.notifyItemInserted(tweetsList.size)
-                                loading = false
+                                if (nextResultsUrl != null && nextResultsUrl.isNotEmpty()) {
+                                    loadMoreFlohTweets(nextResultsUrl)
+                                } else {
+                                    hideProgressBarAndResetLoadingFlag()
+                                }
                             }, Constants.ENDLESS_SCROLL_DELAY)
                         }
                     }
                 }
             }
         })
+    }
+
+    private fun hideProgressBarAndResetLoadingFlag() {
+        //Remove progress item
+        tweetsList.removeAt(tweetsList.size - 1)
+        tweetsAdapter.notifyItemRemoved(tweetsList.size)
+        loading = false
     }
 
     private fun fetchFlohTweets() {
@@ -107,7 +115,7 @@ class MainActivity : AppCompatActivity() {
         ).flatMap { twitterToken ->
             return@flatMap RestClient.getTweetAPI().getFlohTweets(
                 tweetName = Constants.TWEET_NAME,
-                /* count = Constants.TWEET_COUNT,*/
+                count = Constants.TWEET_COUNT,
                 header = "${twitterToken.token_type} ${twitterToken.access_token}",
                 contentType = Constants.CONTENT_TYPE
             )
@@ -117,11 +125,49 @@ class MainActivity : AppCompatActivity() {
             .doAfterTerminate {
                 swipeRefreshLayout.isRefreshing = false
             }
-            .subscribe({ success ->
-                val statuses = success.statuses
-                tweetsAdapter.addAll(statuses)
+            .subscribe({ twitterResponse ->
+                val tweets = twitterResponse.statuses
 
-            }, { error -> })
+                nextResultsUrl = twitterResponse.search_metadata.nextResultUrl
+                tweetsAdapter.addAll(tweets)
+
+            }, { error ->
+                showLogE(TAG, "Error ${error.printStackTrace()}")
+            })
+    }
+
+    private fun loadMoreFlohTweets(remainingUrl: String) {
+        val encodedKey = Base64Encoding.encodeStringToBase64(
+            key =
+            Constants.CONSUMER_KEY + ":" + Constants.CONSUMER_SECRET
+        )
+
+        disposable = RestClient.getTweetAPI().getAuthToken(
+            header = "Basic $encodedKey",
+            grantType = Constants.GRANT_TYPE
+        ).flatMap { twitterToken ->
+            return@flatMap RestClient.getTweetAPI().loadMoreFlohTweets(
+                url = Constants.TWEETS_API + remainingUrl,
+                header = "${twitterToken.token_type} ${twitterToken.access_token}",
+                contentType = Constants.CONTENT_TYPE
+            )
+        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ twitterResponse ->
+
+                val tweets = twitterResponse.statuses
+
+                nextResultsUrl = twitterResponse.search_metadata.nextResultUrl
+
+                hideProgressBarAndResetLoadingFlag()
+                tweetsAdapter.appendMoreTweets(tweets)
+
+
+            }, { error ->
+                showLogE(TAG, "Error ${error.printStackTrace()}")
+                hideProgressBarAndResetLoadingFlag()
+            })
     }
 
     private fun fetchFlohMentions() {

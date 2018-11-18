@@ -44,7 +44,6 @@ class TweetsAdapter(
                 viewHolder.itemView.tweetMessage.text = tweets?.tweetMessage
             }
             else -> {
-                //(viewHolder as LoadMoreHolder).itemView.loadMoreProgressBar
             }
         }
 
@@ -70,6 +69,10 @@ class TweetsAdapter(
         tweetsList.clear()
         this.tweetsList.addAll(freshTweetsList)
         notifyDataSetChanged()
+    }
+
+    fun appendMoreTweets(tweetsList: List<Statuses>) {
+        this.tweetsList.addAll(tweetsList)
     }
 
     inner class TweetsHolder(itemView: View) : RecyclerView.ViewHolder(itemView)

@@ -20,7 +20,14 @@ interface TweetAPI {
     @GET(Constants.TWEETS_API)
     fun getFlohTweets(
         @Query("q") tweetName: String,
-       /* @Query("count") count: Int,*/
+        @Query("count") count: Int,
+        @Header("Authorization") header: String,
+        @Header("Content-Type") contentType: String
+    ): Single<TwitterAPIResponse>
+
+    @GET
+    fun loadMoreFlohTweets(
+        @Url url: String,
         @Header("Authorization") header: String,
         @Header("Content-Type") contentType: String
     ): Single<TwitterAPIResponse>
