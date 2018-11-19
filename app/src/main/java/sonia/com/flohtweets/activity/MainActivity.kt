@@ -101,7 +101,6 @@ class MainActivity : AppCompatActivity() {
                     if (!loading) {
                         if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
                             loading = true
-                            showLogE(TAG, message = "Last Item Wow ! $nextResultsUrl")
 
                             tweetsList.add(null)
                             recyclerView.post {
