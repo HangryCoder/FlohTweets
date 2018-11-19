@@ -187,11 +187,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun showTweetsList() {
         loadingLayout.visibility = View.INVISIBLE
-        swipeRefreshLayout.visibility = View.VISIBLE
+        tweetsRecyclerView.visibility = View.VISIBLE
     }
 
     private fun showErrorMessage() {
-        swipeRefreshLayout.visibility = View.INVISIBLE
+        tweetsRecyclerView.visibility = View.INVISIBLE
         loadingLayout.visibility = View.VISIBLE
         progressBar.visibility = View.INVISIBLE
         loadingPleaseWaitText.text = resources.getString(R.string.no_internet_connection)
