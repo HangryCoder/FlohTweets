@@ -15,17 +15,16 @@ import android.arch.lifecycle.MutableLiveData
 import sonia.com.flohtweets.model.TwitterAPIResponse
 
 
-class TweetsRepository /*: TweetsDataSource*/ {
+class TweetsRepository {
 
     private var disposable: Disposable? = null
     private var tweetRestClient: TweetAPI = RestClient.getTweetAPI()
-    private var tweetsList: LiveData<List<Statuses>>? = null
 
-    /*override*/ fun getTweets(): LiveData<TwitterAPIResponse> {
+    fun getTweets(): LiveData<TwitterAPIResponse> {
 
         val data = MutableLiveData<TwitterAPIResponse>()
 
-        disposable = getAuthToken()
+        getAuthToken()
             .flatMap { twitterToken ->
                 return@flatMap tweetRestClient.getFlohTweets(
                     tweetName = Constants.TWEET_NAME,
@@ -36,17 +35,9 @@ class TweetsRepository /*: TweetsDataSource*/ {
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doAfterTerminate {
-                //callback.onTerminate()
-            }
             .subscribe({ twitterResponse ->
-               // val tweets = twitterResponse.statuses
-
-                // callback.onTweetsLoaded(tweets)
                 data.value = twitterResponse
-
             }, { error ->
-                // callback.onTweetsNotAvailable(error)
                 data.value = null
             })
         return data

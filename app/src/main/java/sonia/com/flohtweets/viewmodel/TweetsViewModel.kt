@@ -8,13 +8,12 @@ import sonia.com.flohtweets.model.TwitterAPIResponse
 class TweetsViewModel : ViewModel() {
 
     private var tweetsRepository: TweetsRepository? = null
+    private val TAG by lazy {
+        TweetsViewModel::class.java.simpleName
+    }
 
     init {
         tweetsRepository = TweetsRepository()
-    }
-
-    private val TAG by lazy {
-        TweetsViewModel::class.java.simpleName
     }
 
     private var twitterResponse: LiveData<TwitterAPIResponse>? = null
@@ -23,6 +22,11 @@ class TweetsViewModel : ViewModel() {
         if (twitterResponse == null) {
             twitterResponse = tweetsRepository?.getTweets()
         }
+        return twitterResponse as LiveData<TwitterAPIResponse>
+    }
+
+    fun refreshFlowTweets(): LiveData<TwitterAPIResponse> {
+        twitterResponse = tweetsRepository?.getTweets()
         return twitterResponse as LiveData<TwitterAPIResponse>
     }
 

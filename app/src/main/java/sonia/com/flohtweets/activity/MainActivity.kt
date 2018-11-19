@@ -43,6 +43,8 @@ class MainActivity : AppCompatActivity() {
 
     private var nextResultsUrl = ""
 
+    private lateinit var tweetsViewModel: TweetsViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -55,11 +57,10 @@ class MainActivity : AppCompatActivity() {
 
         endlessScrolling()
 
-        //fetchFlohTweets()
-
-        val tweetsViewModel = ViewModelProviders.of(this).get(TweetsViewModel::class.java)
+        tweetsViewModel = ViewModelProviders.of(this).get(TweetsViewModel::class.java)
 
         tweetsViewModel.getFlowTweets().observe(this, Observer { twitterResponse ->
+            showLogE(TAG, "Normal Fetch")
             if (twitterResponse != null) {
                 val tweets = twitterResponse.statuses
 
@@ -95,6 +96,25 @@ class MainActivity : AppCompatActivity() {
         swipeRefreshLayout.setColorSchemeColors(resources.getColor(R.color.colorPrimary))
         swipeRefreshLayout.setOnRefreshListener {
             //fetchFlohTweets()
+            tweetsViewModel.refreshFlowTweets().observe(this, Observer { twitterResponse ->
+                showLogE(TAG, "Pull to Refresh")
+                swipeRefreshLayout.isRefreshing = false
+
+                if (twitterResponse != null) {
+                    val tweets = twitterResponse.statuses
+
+                    nextResultsUrl = twitterResponse.search_metadata.nextResultUrl
+                    tweetsAdapter.addAll(tweets)
+
+                    showTweetsList()
+                } else {
+                    swipeRefreshLayout.visibility = View.INVISIBLE
+                    loadingLayout.visibility = View.VISIBLE
+                    progressBar.visibility = View.INVISIBLE
+                    loadingPleaseWaitText.text = resources.getString(R.string.no_internet_connection)
+                }
+
+            })
         }
     }
 
@@ -118,7 +138,9 @@ class MainActivity : AppCompatActivity() {
                             showLogE(TAG, message = "Last Item Wow ! $nextResultsUrl")
 
                             tweetsList.add(null)
-                            tweetsAdapter.notifyItemInserted(tweetsList.size - 1)
+                            recyclerView.post {
+                                tweetsAdapter.notifyItemInserted(tweetsList.size - 1)
+                            }
 
                             handler?.postDelayed({
 
