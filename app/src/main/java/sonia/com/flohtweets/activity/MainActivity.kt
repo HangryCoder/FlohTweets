@@ -44,12 +44,23 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        setUpToolbar()
+
+        setUpRecyclerView()
+
+        pullToRefresh()
+
+        endlessScrolling()
+
+        fetchFlohTweets()
+    }
+
+    private fun setUpToolbar() {
         setSupportActionBar(toolbar)
-
         changeToolbarFont(toolbar_layout)
+    }
 
-        handler = Handler()
-
+    private fun setUpRecyclerView() {
         tweetsAdapter = TweetsAdapter(
             context = this@MainActivity,
             tweetsList = tweetsList
@@ -57,18 +68,18 @@ class MainActivity : AppCompatActivity() {
         tweetsRecyclerView.addItemDecoration(VerticalItemDecoration(10))
 
         tweetsRecyclerView.adapter = tweetsAdapter
+    }
 
+    private fun pullToRefresh() {
         swipeRefreshLayout.setColorSchemeColors(resources.getColor(R.color.colorPrimary))
         swipeRefreshLayout.setOnRefreshListener {
             fetchFlohTweets()
         }
-
-        endlessScrolling()
-
-        fetchFlohTweets()
     }
 
     private fun endlessScrolling() {
+        handler = Handler()
+
         tweetsRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
