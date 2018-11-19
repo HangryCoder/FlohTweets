@@ -19,6 +19,7 @@ import sonia.com.flohtweets.R
 import sonia.com.flohtweets.network.RestClient
 import sonia.com.flohtweets.adapter.TweetsAdapter
 import sonia.com.flohtweets.model.Statuses
+import sonia.com.flohtweets.model.TwitterAPIResponse
 import sonia.com.flohtweets.model.TwitterToken
 import sonia.com.flohtweets.utils.*
 import sonia.com.flohtweets.viewmodel.TweetsViewModel
@@ -58,24 +59,7 @@ class MainActivity : AppCompatActivity() {
 
         endlessScrolling()
 
-        tweetsViewModel = ViewModelProviders.of(this).get(TweetsViewModel::class.java)
-
-        tweetsViewModel.getFlowTweets().observe(this, Observer { twitterResponse ->
-            showLogE(TAG, "Normal Fetch")
-            if (twitterResponse != null) {
-                val tweets = twitterResponse.statuses
-
-                nextResultsUrl = twitterResponse.search_metadata.nextResultUrl
-                tweetsAdapter.addAll(tweets)
-
-                showTweetsList()
-            } else {
-                swipeRefreshLayout.visibility = View.INVISIBLE
-                loadingLayout.visibility = View.VISIBLE
-                progressBar.visibility = View.INVISIBLE
-                loadingPleaseWaitText.text = resources.getString(R.string.no_internet_connection)
-            }
-        })
+        setUpViewModelAndFetchTweets()
     }
 
     private fun setUpToolbar() {
@@ -103,20 +87,7 @@ class MainActivity : AppCompatActivity() {
                 showLogE(TAG, "Pull to Refresh")
                 swipeRefreshLayout.isRefreshing = false
 
-                if (twitterResponse != null) {
-                    val tweets = twitterResponse.statuses
-
-                    nextResultsUrl = twitterResponse.search_metadata.nextResultUrl
-                    tweetsAdapter.addAll(tweets)
-
-                    showTweetsList()
-                } else {
-                    swipeRefreshLayout.visibility = View.INVISIBLE
-                    loadingLayout.visibility = View.VISIBLE
-                    progressBar.visibility = View.INVISIBLE
-                    loadingPleaseWaitText.text = resources.getString(R.string.no_internet_connection)
-                }
-
+                flohTweetsResponse(twitterResponse)
             })
         }
     }
@@ -148,7 +119,6 @@ class MainActivity : AppCompatActivity() {
                             handler?.postDelayed({
 
                                 if (nextResultsUrl != null && nextResultsUrl.isNotEmpty()) {
-                                    //loadMoreFlohTweets(nextResultsUrl)
                                     endlessScrollingFeature()
                                 } else {
                                     hideProgressBarAndResetLoadingFlag()
@@ -178,12 +148,34 @@ class MainActivity : AppCompatActivity() {
 
                 val liveDataTwitterResponse = (tweetsViewModel.twitterResponse as MutableLiveData).value
                 liveDataTwitterResponse?.statuses = tweetsList as List<Statuses>
-                liveDataTwitterResponse?.search_metadata?.nextResultUrl = nextResultsUrl
+                liveDataTwitterResponse?.search_metadata?.nextResultUrl = nextResultsUrl?:""
             } else {
                 hideProgressBarAndResetLoadingFlag()
                 showToast(context = this@MainActivity, message = resources.getString(R.string.no_more_tweets))
             }
         })
+    }
+
+    private fun setUpViewModelAndFetchTweets() {
+        tweetsViewModel = ViewModelProviders.of(this).get(TweetsViewModel::class.java)
+
+        tweetsViewModel.getFlowTweets().observe(this, Observer { twitterResponse ->
+            showLogE(TAG, "Normal Fetch")
+            flohTweetsResponse(twitterResponse)
+        })
+    }
+
+    private fun flohTweetsResponse(twitterResponse: TwitterAPIResponse?) {
+        if (twitterResponse != null) {
+            val tweets = twitterResponse.statuses
+
+            nextResultsUrl = twitterResponse.search_metadata.nextResultUrl
+            tweetsAdapter.addAll(tweets)
+
+            showTweetsList()
+        } else {
+            showErrorMessage()
+        }
     }
 
     private fun hideProgressBarAndResetLoadingFlag() {
@@ -198,9 +190,7 @@ class MainActivity : AppCompatActivity() {
         swipeRefreshLayout.visibility = View.VISIBLE
     }
 
-    private fun showErrorMessage(error: Throwable) {
-        showLogE(TAG, "Error ${error.printStackTrace()}")
-
+    private fun showErrorMessage() {
         swipeRefreshLayout.visibility = View.INVISIBLE
         loadingLayout.visibility = View.VISIBLE
         progressBar.visibility = View.INVISIBLE
