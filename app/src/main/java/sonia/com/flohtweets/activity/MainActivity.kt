@@ -95,9 +95,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun pullToRefresh() {
         swipeRefreshLayout.setColorSchemeColors(resources.getColor(R.color.colorPrimary))
+
         swipeRefreshLayout.setOnRefreshListener {
-            //fetchFlohTweets()
+
             tweetsViewModel.refreshFlowTweets().observe(this, Observer { twitterResponse ->
+
                 showLogE(TAG, "Pull to Refresh")
                 swipeRefreshLayout.isRefreshing = false
 
@@ -176,7 +178,7 @@ class MainActivity : AppCompatActivity() {
 
                 val liveDataTwitterResponse = (tweetsViewModel.twitterResponse as MutableLiveData).value
                 liveDataTwitterResponse?.statuses = tweetsList as List<Statuses>
-                liveDataTwitterResponse?.search_metadata?.nextResultUrl = nextResultsUrl ?: ""
+                liveDataTwitterResponse?.search_metadata?.nextResultUrl = nextResultsUrl
             } else {
                 hideProgressBarAndResetLoadingFlag()
                 showToast(context = this@MainActivity, message = resources.getString(R.string.no_more_tweets))
@@ -191,46 +193,6 @@ class MainActivity : AppCompatActivity() {
         loading = false
     }
 
-    private fun fetchFlohTweets() {
-        disposable = getAuthToken()
-            .flatMap { twitterToken ->
-                return@flatMap RestClient.getTweetAPI().getFlohTweets(
-                    tweetName = Constants.TWEET_NAME,
-                    count = Constants.TWEET_COUNT,
-                    header = "${twitterToken.token_type} ${twitterToken.access_token}",
-                    contentType = Constants.CONTENT_TYPE
-                )
-            }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doAfterTerminate {
-                swipeRefreshLayout.isRefreshing = false
-            }
-            .subscribe({ twitterResponse ->
-                val tweets = twitterResponse.statuses
-
-                nextResultsUrl = twitterResponse.search_metadata.nextResultUrl
-                tweetsAdapter.addAll(tweets)
-
-                showTweetsList()
-
-            }, { error ->
-                showErrorMessage(error)
-            })
-    }
-
-    private fun getAuthToken(): Single<TwitterToken> {
-        val encodedKey = Base64Encoding.encodeStringToBase64(
-            key =
-            Constants.CONSUMER_KEY + ":" + Constants.CONSUMER_SECRET
-        )
-
-        return RestClient.getTweetAPI().getAuthToken(
-            header = "Basic $encodedKey",
-            grantType = Constants.GRANT_TYPE
-        )
-    }
-
     private fun showTweetsList() {
         loadingLayout.visibility = View.INVISIBLE
         swipeRefreshLayout.visibility = View.VISIBLE
@@ -243,34 +205,6 @@ class MainActivity : AppCompatActivity() {
         loadingLayout.visibility = View.VISIBLE
         progressBar.visibility = View.INVISIBLE
         loadingPleaseWaitText.text = resources.getString(R.string.no_internet_connection)
-    }
-
-    private fun loadMoreFlohTweets(remainingUrl: String) {
-        disposable = getAuthToken()
-            .flatMap { twitterToken ->
-                return@flatMap RestClient.getTweetAPI().loadMoreFlohTweets(
-                    url = Constants.TWEETS_API + remainingUrl,
-                    header = "${twitterToken.token_type} ${twitterToken.access_token}",
-                    contentType = Constants.CONTENT_TYPE
-                )
-            }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ twitterResponse ->
-
-                val tweets = twitterResponse.statuses
-
-                nextResultsUrl = twitterResponse.search_metadata.nextResultUrl
-
-                hideProgressBarAndResetLoadingFlag()
-                tweetsAdapter.appendMoreTweets(tweets)
-
-
-            }, { error ->
-                showLogE(TAG, "Error ${error.printStackTrace()}")
-                hideProgressBarAndResetLoadingFlag()
-                showToast(context = this@MainActivity, message = resources.getString(R.string.no_more_tweets))
-            })
     }
 
     override fun onDestroy() {

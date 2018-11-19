@@ -3,9 +3,7 @@ package sonia.com.flohtweets.data
 import android.arch.lifecycle.LiveData
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import sonia.com.flohtweets.model.Statuses
 import sonia.com.flohtweets.model.TwitterToken
 import sonia.com.flohtweets.network.RestClient
 import sonia.com.flohtweets.network.TweetAPI
@@ -17,7 +15,6 @@ import sonia.com.flohtweets.model.TwitterAPIResponse
 
 class TweetsRepository {
 
-    private var disposable: Disposable? = null
     private var tweetRestClient: TweetAPI = RestClient.getTweetAPI()
 
     fun getTweets(): LiveData<TwitterAPIResponse> {
@@ -59,7 +56,7 @@ class TweetsRepository {
 
         val twitterAPIResponse = MutableLiveData<TwitterAPIResponse>()
 
-        disposable = getAuthToken()
+        getAuthToken()
             .flatMap { twitterToken ->
                 return@flatMap tweetRestClient.loadMoreFlohTweets(
                     url = Constants.TWEETS_API + remainingUrl,

@@ -13,13 +13,11 @@ class TweetsViewModel : ViewModel() {
     private val TAG by lazy {
         TweetsViewModel::class.java.simpleName
     }
-    // private var nextResultsUrl: String? = ""
+    var twitterResponse: LiveData<TwitterAPIResponse>? = null
 
     init {
         tweetsRepository = TweetsRepository()
     }
-
-    var twitterResponse: LiveData<TwitterAPIResponse>? = null
 
     fun getFlowTweets(): LiveData<TwitterAPIResponse> {
         if (twitterResponse == null) {
