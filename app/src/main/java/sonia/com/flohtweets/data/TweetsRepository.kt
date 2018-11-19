@@ -55,7 +55,10 @@ class TweetsRepository {
         )
     }
 
-    /* override*/ fun loadMoreTweets(remainingUrl: String, callback: TweetsDataSource.LoadMoreTweetsCallback) {
+    fun loadMoreTweets(remainingUrl: String): LiveData<TwitterAPIResponse> {
+
+        val twitterAPIResponse = MutableLiveData<TwitterAPIResponse>()
+
         disposable = getAuthToken()
             .flatMap { twitterToken ->
                 return@flatMap tweetRestClient.loadMoreFlohTweets(
@@ -67,12 +70,10 @@ class TweetsRepository {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ twitterResponse ->
-
-                val tweets = twitterResponse.statuses
-                callback.onTweetsLoaded(tweets)
-
+                twitterAPIResponse.value = twitterResponse
             }, { error ->
-                callback.onTweetsNotAvailable(error)
+                twitterAPIResponse.value = null
             })
+        return twitterAPIResponse
     }
 }

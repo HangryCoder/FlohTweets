@@ -10,7 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import sonia.com.flohtweets.BuildConfig
 
-fun AppCompatActivity.showLogE(TAG: String, message: String) {
+fun showLogE(TAG: String, message: String) {
     if (BuildConfig.DEBUG) {
         Log.e(TAG, message)
     }

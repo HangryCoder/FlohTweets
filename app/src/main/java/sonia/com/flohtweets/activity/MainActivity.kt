@@ -145,7 +145,8 @@ class MainActivity : AppCompatActivity() {
                             handler?.postDelayed({
 
                                 if (nextResultsUrl != null && nextResultsUrl.isNotEmpty()) {
-                                    loadMoreFlohTweets(nextResultsUrl)
+                                    //loadMoreFlohTweets(nextResultsUrl)
+                                    endlessScrollingFeature()
                                 } else {
                                     hideProgressBarAndResetLoadingFlag()
                                     showToast(
@@ -157,6 +158,22 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
+            }
+        })
+    }
+
+    private fun endlessScrollingFeature() {
+        tweetsViewModel.loadMoreTweets().observe(this, Observer { twitterResponse ->
+            if (twitterResponse != null) {
+                val tweets = twitterResponse.statuses
+
+                nextResultsUrl = twitterResponse.search_metadata.nextResultUrl
+
+                hideProgressBarAndResetLoadingFlag()
+                tweetsAdapter.appendMoreTweets(tweets)
+            } else {
+                hideProgressBarAndResetLoadingFlag()
+                showToast(context = this@MainActivity, message = resources.getString(R.string.no_more_tweets))
             }
         })
     }
