@@ -1,12 +1,12 @@
 package sonia.com.flohtweets.activity
 
-import android.graphics.Typeface
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -16,9 +16,9 @@ import sonia.com.flohtweets.R
 import sonia.com.flohtweets.network.RestClient
 import sonia.com.flohtweets.adapter.TweetsAdapter
 import sonia.com.flohtweets.model.Statuses
+import sonia.com.flohtweets.model.TwitterToken
 import sonia.com.flohtweets.utils.*
 import kotlin.collections.ArrayList
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -115,22 +115,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchFlohTweets() {
-        val encodedKey = Base64Encoding.encodeStringToBase64(
-            key =
-            Constants.CONSUMER_KEY + ":" + Constants.CONSUMER_SECRET
-        )
-
-        disposable = RestClient.getTweetAPI().getAuthToken(
-            header = "Basic $encodedKey",
-            grantType = Constants.GRANT_TYPE
-        ).flatMap { twitterToken ->
-            return@flatMap RestClient.getTweetAPI().getFlohTweets(
-                tweetName = Constants.TWEET_NAME,
-                count = Constants.TWEET_COUNT,
-                header = "${twitterToken.token_type} ${twitterToken.access_token}",
-                contentType = Constants.CONTENT_TYPE
-            )
-        }
+        disposable = getAuthToken()
+            .flatMap { twitterToken ->
+                return@flatMap RestClient.getTweetAPI().getFlohTweets(
+                    tweetName = Constants.TWEET_NAME,
+                    count = Constants.TWEET_COUNT,
+                    header = "${twitterToken.token_type} ${twitterToken.access_token}",
+                    contentType = Constants.CONTENT_TYPE
+                )
+            }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doAfterTerminate {
@@ -145,11 +138,20 @@ class MainActivity : AppCompatActivity() {
                 showTweetsList()
 
             }, { error ->
-                showLogE(TAG, "Error ${error.printStackTrace()}")
-
-                showErrorMessage()
-
+                showErrorMessage(error)
             })
+    }
+
+    private fun getAuthToken(): Single<TwitterToken> {
+        val encodedKey = Base64Encoding.encodeStringToBase64(
+            key =
+            Constants.CONSUMER_KEY + ":" + Constants.CONSUMER_SECRET
+        )
+
+        return RestClient.getTweetAPI().getAuthToken(
+            header = "Basic $encodedKey",
+            grantType = Constants.GRANT_TYPE
+        )
     }
 
     private fun showTweetsList() {
@@ -157,7 +159,9 @@ class MainActivity : AppCompatActivity() {
         swipeRefreshLayout.visibility = View.VISIBLE
     }
 
-    private fun showErrorMessage() {
+    private fun showErrorMessage(error: Throwable) {
+        showLogE(TAG, "Error ${error.printStackTrace()}")
+
         swipeRefreshLayout.visibility = View.INVISIBLE
         loadingLayout.visibility = View.VISIBLE
         progressBar.visibility = View.INVISIBLE
@@ -165,21 +169,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadMoreFlohTweets(remainingUrl: String) {
-        val encodedKey = Base64Encoding.encodeStringToBase64(
-            key =
-            Constants.CONSUMER_KEY + ":" + Constants.CONSUMER_SECRET
-        )
-
-        disposable = RestClient.getTweetAPI().getAuthToken(
-            header = "Basic $encodedKey",
-            grantType = Constants.GRANT_TYPE
-        ).flatMap { twitterToken ->
-            return@flatMap RestClient.getTweetAPI().loadMoreFlohTweets(
-                url = Constants.TWEETS_API + remainingUrl,
-                header = "${twitterToken.token_type} ${twitterToken.access_token}",
-                contentType = Constants.CONTENT_TYPE
-            )
-        }
+        disposable = getAuthToken()
+            .flatMap { twitterToken ->
+                return@flatMap RestClient.getTweetAPI().loadMoreFlohTweets(
+                    url = Constants.TWEETS_API + remainingUrl,
+                    header = "${twitterToken.token_type} ${twitterToken.access_token}",
+                    contentType = Constants.CONTENT_TYPE
+                )
+            }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ twitterResponse ->

@@ -61,11 +61,6 @@ class TweetsAdapter(
         }
     }
 
-    fun clear() {
-        tweetsList.clear()
-        notifyDataSetChanged()
-    }
-
     fun addAll(freshTweetsList: List<Statuses>) {
         tweetsList.clear()
         this.tweetsList.addAll(freshTweetsList)

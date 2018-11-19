@@ -16,8 +16,6 @@ class Constants {
 
         const val TWEETS_API = "1.1/search/tweets.json"
 
-        const val TWEETS_MENTIONS_API = "1.1/statuses/mentions_timeline.json"
-
         const val TWITTER_TOKEN = "oauth2/token"
 
         const val RETROFIT_TIMEOUT: Long = 2
