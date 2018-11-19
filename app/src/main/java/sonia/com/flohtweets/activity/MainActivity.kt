@@ -1,5 +1,6 @@
 package sonia.com.flohtweets.activity
 
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.support.v7.app.AppCompatActivity
@@ -164,6 +165,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun endlessScrollingFeature() {
         tweetsViewModel.loadMoreTweets().observe(this, Observer { twitterResponse ->
+            showLogE(TAG, "endlessScroll!!!!")
             if (twitterResponse != null) {
                 val tweets = twitterResponse.statuses
 
@@ -171,6 +173,10 @@ class MainActivity : AppCompatActivity() {
 
                 hideProgressBarAndResetLoadingFlag()
                 tweetsAdapter.appendMoreTweets(tweets)
+
+                val liveDataTwitterResponse = (tweetsViewModel.twitterResponse as MutableLiveData).value
+                liveDataTwitterResponse?.statuses = tweetsList as List<Statuses>
+                liveDataTwitterResponse?.search_metadata?.nextResultUrl = nextResultsUrl ?: ""
             } else {
                 hideProgressBarAndResetLoadingFlag()
                 showToast(context = this@MainActivity, message = resources.getString(R.string.no_more_tweets))

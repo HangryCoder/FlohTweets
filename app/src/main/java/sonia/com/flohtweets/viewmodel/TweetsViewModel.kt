@@ -19,13 +19,11 @@ class TweetsViewModel : ViewModel() {
         tweetsRepository = TweetsRepository()
     }
 
-    private var twitterResponse: LiveData<TwitterAPIResponse>? = null
+    var twitterResponse: LiveData<TwitterAPIResponse>? = null
 
     fun getFlowTweets(): LiveData<TwitterAPIResponse> {
         if (twitterResponse == null) {
             twitterResponse = tweetsRepository?.getTweets()
-            // nextResultsUrl = (twitterResponse as MutableLiveData).value?.search_metadata?.nextResultUrl
-            // showLogE(TAG, "NextUrl $nextResultsUrl")
         }
         return twitterResponse as LiveData<TwitterAPIResponse>
     }
@@ -36,14 +34,10 @@ class TweetsViewModel : ViewModel() {
     }
 
     fun loadMoreTweets(): LiveData<TwitterAPIResponse> {
-        // if (twitterResponse == null) {
         val nextResultUrl = (twitterResponse as MutableLiveData).value?.search_metadata?.nextResultUrl
         showLogE(TAG, "NextUrl $nextResultUrl")
 
-        twitterResponse = tweetsRepository?.loadMoreTweets(remainingUrl = nextResultUrl!!)
-        //nextResultUrl = (twitterResponse as MutableLiveData).value?.search_metadata?.nextResultUrl
-        //}
-        return twitterResponse as LiveData<TwitterAPIResponse>
+        return tweetsRepository?.loadMoreTweets(remainingUrl = nextResultUrl!!) as LiveData<TwitterAPIResponse>
     }
 
 }
