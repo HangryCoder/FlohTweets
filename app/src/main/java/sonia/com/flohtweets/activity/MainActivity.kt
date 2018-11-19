@@ -1,5 +1,7 @@
 package sonia.com.flohtweets.activity
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -18,6 +20,7 @@ import sonia.com.flohtweets.adapter.TweetsAdapter
 import sonia.com.flohtweets.model.Statuses
 import sonia.com.flohtweets.model.TwitterToken
 import sonia.com.flohtweets.utils.*
+import sonia.com.flohtweets.viewmodel.TweetsViewModel
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
@@ -52,7 +55,25 @@ class MainActivity : AppCompatActivity() {
 
         endlessScrolling()
 
-        fetchFlohTweets()
+        //fetchFlohTweets()
+
+        val tweetsViewModel = ViewModelProviders.of(this).get(TweetsViewModel::class.java)
+
+        tweetsViewModel.getFlowTweets().observe(this, Observer { twitterResponse ->
+            if (twitterResponse != null) {
+                val tweets = twitterResponse.statuses
+
+                nextResultsUrl = twitterResponse.search_metadata.nextResultUrl
+                tweetsAdapter.addAll(tweets)
+
+                showTweetsList()
+            } else {
+                swipeRefreshLayout.visibility = View.INVISIBLE
+                loadingLayout.visibility = View.VISIBLE
+                progressBar.visibility = View.INVISIBLE
+                loadingPleaseWaitText.text = resources.getString(R.string.no_internet_connection)
+            }
+        })
     }
 
     private fun setUpToolbar() {
@@ -73,7 +94,7 @@ class MainActivity : AppCompatActivity() {
     private fun pullToRefresh() {
         swipeRefreshLayout.setColorSchemeColors(resources.getColor(R.color.colorPrimary))
         swipeRefreshLayout.setOnRefreshListener {
-            fetchFlohTweets()
+            //fetchFlohTweets()
         }
     }
 

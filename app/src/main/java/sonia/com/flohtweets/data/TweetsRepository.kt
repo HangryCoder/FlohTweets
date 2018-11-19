@@ -11,14 +11,20 @@ import sonia.com.flohtweets.network.RestClient
 import sonia.com.flohtweets.network.TweetAPI
 import sonia.com.flohtweets.utils.Base64Encoding
 import sonia.com.flohtweets.utils.Constants
+import android.arch.lifecycle.MutableLiveData
+import sonia.com.flohtweets.model.TwitterAPIResponse
 
-class TweetsRemoteDataSource : TweetsDataSource {
+
+class TweetsRepository /*: TweetsDataSource*/ {
 
     private var disposable: Disposable? = null
     private var tweetRestClient: TweetAPI = RestClient.getTweetAPI()
     private var tweetsList: LiveData<List<Statuses>>? = null
 
-    override fun getTweets(callback: TweetsDataSource.LoadTweetsCallback) {
+    /*override*/ fun getTweets(): LiveData<TwitterAPIResponse> {
+
+        val data = MutableLiveData<TwitterAPIResponse>()
+
         disposable = getAuthToken()
             .flatMap { twitterToken ->
                 return@flatMap tweetRestClient.getFlohTweets(
@@ -31,16 +37,19 @@ class TweetsRemoteDataSource : TweetsDataSource {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doAfterTerminate {
-                callback.onTerminate()
+                //callback.onTerminate()
             }
             .subscribe({ twitterResponse ->
-                val tweets = twitterResponse.statuses
+               // val tweets = twitterResponse.statuses
 
-                callback.onTweetsLoaded(tweets)
+                // callback.onTweetsLoaded(tweets)
+                data.value = twitterResponse
 
             }, { error ->
-                callback.onTweetsNotAvailable(error)
+                // callback.onTweetsNotAvailable(error)
+                data.value = null
             })
+        return data
     }
 
     private fun getAuthToken(): Single<TwitterToken> {
@@ -55,7 +64,7 @@ class TweetsRemoteDataSource : TweetsDataSource {
         )
     }
 
-    override fun loadMoreTweets(remainingUrl: String, callback: TweetsDataSource.LoadMoreTweetsCallback) {
+    /* override*/ fun loadMoreTweets(remainingUrl: String, callback: TweetsDataSource.LoadMoreTweetsCallback) {
         disposable = getAuthToken()
             .flatMap { twitterToken ->
                 return@flatMap tweetRestClient.loadMoreFlohTweets(
