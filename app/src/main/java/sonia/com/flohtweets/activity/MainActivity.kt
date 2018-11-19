@@ -16,11 +16,9 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.layout_loading.*
 import sonia.com.flohtweets.R
-import sonia.com.flohtweets.network.RestClient
 import sonia.com.flohtweets.adapter.TweetsAdapter
 import sonia.com.flohtweets.model.Statuses
 import sonia.com.flohtweets.model.TwitterAPIResponse
-import sonia.com.flohtweets.model.TwitterToken
 import sonia.com.flohtweets.utils.*
 import sonia.com.flohtweets.viewmodel.TweetsViewModel
 import kotlin.collections.ArrayList
@@ -33,8 +31,6 @@ class MainActivity : AppCompatActivity() {
 
     private var tweetsList: ArrayList<Statuses?> = ArrayList()
     private lateinit var tweetsAdapter: TweetsAdapter
-
-    private var disposable: Disposable? = null
 
     private var loading = false
     private var pastVisibleItems: Int = 0
@@ -119,7 +115,7 @@ class MainActivity : AppCompatActivity() {
                             handler?.postDelayed({
 
                                 if (nextResultsUrl != null && nextResultsUrl.isNotEmpty()) {
-                                    endlessScrollingFeature()
+                                    loadMoreTweets()
                                 } else {
                                     hideProgressBarAndResetLoadingFlag()
                                     showToast(
@@ -135,7 +131,7 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun endlessScrollingFeature() {
+    private fun loadMoreTweets() {
         tweetsViewModel.loadMoreTweets().observe(this, Observer { twitterResponse ->
             showLogE(TAG, "endlessScroll!!!!")
             if (twitterResponse != null) {
@@ -146,9 +142,10 @@ class MainActivity : AppCompatActivity() {
                 hideProgressBarAndResetLoadingFlag()
                 tweetsAdapter.appendMoreTweets(tweets)
 
+                //Updating the liveData again!
                 val liveDataTwitterResponse = (tweetsViewModel.twitterResponse as MutableLiveData).value
                 liveDataTwitterResponse?.statuses = tweetsList as List<Statuses>
-                liveDataTwitterResponse?.search_metadata?.nextResultUrl = nextResultsUrl?:""
+                liveDataTwitterResponse?.search_metadata?.nextResultUrl = nextResultsUrl ?: ""
             } else {
                 hideProgressBarAndResetLoadingFlag()
                 showToast(context = this@MainActivity, message = resources.getString(R.string.no_more_tweets))
@@ -195,11 +192,5 @@ class MainActivity : AppCompatActivity() {
         loadingLayout.visibility = View.VISIBLE
         progressBar.visibility = View.INVISIBLE
         loadingPleaseWaitText.text = resources.getString(R.string.no_internet_connection)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        disposable?.dispose()
     }
 }
