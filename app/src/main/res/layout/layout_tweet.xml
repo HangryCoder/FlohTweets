@@ -1,77 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                             xmlns:app="http://schemas.android.com/apk/res-auto"
-                                             xmlns:tools="http://schemas.android.com/tools"
-                                             android:layout_width="match_parent"
-                                             android:layout_height="wrap_content">
+<layout>
+    <data>
+        <variable name="tweet" type="sonia.com.flohtweets.model.Statuses"/>
+    </data>
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                 xmlns:tools="http://schemas.android.com/tools"
+                                                 android:layout_width="match_parent"
+                                                 android:layout_height="wrap_content">
 
 
-    <de.hdodenhof.circleimageview.CircleImageView android:layout_width="@dimen/tweetUserProfileSize"
-                                                  android:layout_height="@dimen/tweetUserProfileSize"
-                                                  tools:src="@tools:sample/avatars"
-                                                  android:id="@+id/tweetUserProfile"
-                                                  android:layout_marginTop="20dp"
-                                                  app:layout_constraintTop_toTopOf="parent"
-                                                  app:layout_constraintStart_toStartOf="parent"
-                                                  android:layout_marginStart="18dp"
-                                                  android:layout_marginLeft="18dp"/>
+        <de.hdodenhof.circleimageview.CircleImageView android:layout_width="@dimen/tweetUserProfileSize"
+                                                      android:layout_height="@dimen/tweetUserProfileSize"
+                                                      tools:src="@tools:sample/avatars"
+                                                      android:id="@+id/tweetUserProfile"
+                                                      android:layout_marginTop="20dp"
+                                                      app:layout_constraintTop_toTopOf="parent"
+                                                      app:layout_constraintStart_toStartOf="parent"
+                                                      android:layout_marginStart="18dp"
+                                                      android:layout_marginLeft="18dp"/>
 
-    <TextView
-            tools:text="Sonia Wadji"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/tweetUsernameSize"
-            android:textColor="@color/usernameColor"
-            android:id="@+id/tweetUsername"
-            android:fontFamily="@font/montserratbold"
-            app:layout_constraintTop_toTopOf="@+id/tweetUserProfile"
-            app:layout_constraintStart_toEndOf="@+id/tweetUserProfile"
-            android:layout_marginStart="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="18dp"
-    />
+        <TextView
+                tools:text="Sonia Wadji"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/tweetUsernameSize"
+                android:textColor="@color/usernameColor"
+                android:text="@{tweet.twitterUser.name}"
+                android:id="@+id/tweetUsername"
+                android:fontFamily="@font/montserratbold"
+                app:layout_constraintTop_toTopOf="@+id/tweetUserProfile"
+                app:layout_constraintStart_toEndOf="@+id/tweetUserProfile"
+                android:layout_marginStart="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="18dp"
+        />
 
-    <TextView
-            tools:text="s_wadji"
-            android:layout_width="0dp"
-            android:fontFamily="@font/montserratsemibold"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/tweetScreenNameSize"
-            android:textColor="@color/screenNameColor"
-            android:id="@+id/tweetScreename"
-            app:layout_constraintStart_toStartOf="@+id/tweetUsername"
-            app:layout_constraintTop_toBottomOf="@+id/tweetUsername"
-    />
+        <TextView
+                tools:text="s_wadji"
+                android:layout_width="0dp"
+                android:fontFamily="@font/montserratsemibold"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/tweetScreenNameSize"
+                android:text="@{tweet.twitterUser.userName}"
+                android:textColor="@color/screenNameColor"
+                android:id="@+id/tweetScreename"
+                app:layout_constraintStart_toStartOf="@+id/tweetUsername"
+                app:layout_constraintTop_toBottomOf="@+id/tweetUsername"
+        />
 
-    <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/tweetMessage"
-            android:textSize="@dimen/tweetMessageSize"
-            android:fontFamily="@font/montserratregular"
-            android:textColor="@color/tweetMessageColor"
-            android:lineSpacingExtra="6sp"
-            android:text="@string/tweetDefaultMessage"
-            tools:text="@string/tweetDefaultMessage"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@+id/tweetUserProfile"
-            app:layout_constraintStart_toStartOf="@+id/tweetUserProfile"
-            app:layout_constraintEnd_toEndOf="@+id/tweetUsername"/>
+        <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/tweetMessage"
+                android:textSize="@dimen/tweetMessageSize"
+                android:fontFamily="@font/montserratregular"
+                android:textColor="@color/tweetMessageColor"
+                android:lineSpacingExtra="6sp"
+                android:text="@{tweet.tweetMessage}"
+                tools:text="@string/tweetDefaultMessage"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@+id/tweetUserProfile"
+                app:layout_constraintStart_toStartOf="@+id/tweetUserProfile"
+                app:layout_constraintEnd_toEndOf="@+id/tweetUsername"/>
 
-    <View android:layout_width="0dp"
-          android:layout_height="0.5dp"
-          android:id="@+id/divider"
-          android:layout_marginTop="20dp"
-          app:layout_constraintBottom_toBottomOf="parent"
-          app:layout_constraintTop_toBottomOf="@+id/tweetMessage"
-          app:layout_constraintStart_toStartOf="@+id/tweetUserProfile"
-          app:layout_constraintEnd_toEndOf="parent"
-          android:background="@color/dividerColor"/>
+        <View android:layout_width="0dp"
+              android:layout_height="0.5dp"
+              android:id="@+id/divider"
+              android:layout_marginTop="20dp"
+              app:layout_constraintBottom_toBottomOf="parent"
+              app:layout_constraintTop_toBottomOf="@+id/tweetMessage"
+              app:layout_constraintStart_toStartOf="@+id/tweetUserProfile"
+              app:layout_constraintEnd_toEndOf="parent"
+              android:background="@color/dividerColor"/>
 
-    <android.support.constraint.Group android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                      android:id="@+id/group2"
-                                      app:layout_constraintBottom_toBottomOf="@id/tweetUserProfile"
-                                      app:layout_constraintTop_toTopOf="@id/tweetUserProfile"
-                                      app:constraint_referenced_ids="tweetUsername,tweetScreename"/>
+        <android.support.constraint.Group android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                          android:id="@+id/group2"
+                                          app:layout_constraintBottom_toBottomOf="@id/tweetUserProfile"
+                                          app:layout_constraintTop_toTopOf="@id/tweetUserProfile"
+                                          app:constraint_referenced_ids="tweetUsername,tweetScreename"/>
 
-</android.support.constraint.ConstraintLayout>
+    </android.support.constraint.ConstraintLayout>
+</layout>
