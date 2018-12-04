@@ -22,7 +22,7 @@ class TweetsAdapter(
 
         return when (viewType) {
             Constants.TWEET_ITEM -> {
-                val view = LayoutInflater.from(context)//.inflate(R.layout.layout_tweet, container, false)
+                val view = LayoutInflater.from(context)
                 val tweetBinding: LayoutTweetBinding =
                     DataBindingUtil.inflate(view, R.layout.layout_tweet, container, false)
                 TweetsHolder(tweetBinding)
@@ -40,14 +40,7 @@ class TweetsAdapter(
             is TweetsHolder -> {
 
                 val tweets = tweetsList[position]
-                Glide.with(context)
-                    .load(tweets?.twitterUser?.userProfileURL)
-                    .into(viewHolder.itemView.tweetUserProfile)
-
                 viewHolder.bind(tweets)
-                /* viewHolder.itemView.tweetUsername.text = tweets?.twitterUser?.name
-                 viewHolder.itemView.tweetScreename.text = "@${tweets?.twitterUser?.userName}"
-                 viewHolder.itemView.tweetMessage.text = tweets?.tweetMessage*/
             }
             else -> {
             }
@@ -81,9 +74,7 @@ class TweetsAdapter(
 
         fun bind(tweet: Statuses?) {
             with(tweetBinding) {
-                tweetUsername.text = tweet?.twitterUser?.name
-                tweetScreename.text = "@${tweet?.twitterUser?.userName}"
-                tweetMessage.text = tweet?.tweetMessage
+                this.tweet = tweet
             }
         }
     }
