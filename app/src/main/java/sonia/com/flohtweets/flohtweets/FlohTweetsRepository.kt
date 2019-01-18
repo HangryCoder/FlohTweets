@@ -13,7 +13,7 @@ class FlohTweetsRepository : FlohContract.FlohTweets {
 
     private var disposable: Disposable? = null
 
-    override fun fetchFlohTweets(listener: FlohContract.FlohTweets.OnFinishedListener) {
+    override fun getFlohTweets(listener: FlohContract.FlohTweets.GetFlohTweetsCallback) {
         disposable = getAuthToken()
             .flatMap { twitterToken ->
                 return@flatMap RestClient.getTweetAPI().getFlohTweets(
@@ -45,6 +45,27 @@ class FlohTweetsRepository : FlohContract.FlohTweets {
             header = "Basic $encodedKey",
             grantType = Constants.GRANT_TYPE
         )
+    }
+
+    override fun loadMoreFlohTweets(
+        remainingUrl: String,
+        listener: FlohContract.FlohTweets.LoadMoreFlohTweetsCallback
+    ) {
+        disposable = getAuthToken()
+            .flatMap { twitterToken ->
+                return@flatMap RestClient.getTweetAPI().loadMoreFlohTweets(
+                    url = Constants.TWEETS_API + remainingUrl,
+                    header = "${twitterToken.token_type} ${twitterToken.access_token}",
+                    contentType = Constants.CONTENT_TYPE
+                )
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ twitterResponse ->
+                listener.onSuccess(twitterResponse)
+            }, { error ->
+                listener.onError(error)
+            })
     }
 
     fun dispose() {

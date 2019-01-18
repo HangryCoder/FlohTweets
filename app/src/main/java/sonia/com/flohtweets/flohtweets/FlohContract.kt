@@ -25,7 +25,11 @@ interface FlohContract {
             fun onTerminate()
         }
 
-        fun fetchFlohTweets(listener: FlohTweets.OnFinishedListener)
+        interface GetFlohTweetsCallback : OnFinishedListener {}
+        interface LoadMoreFlohTweetsCallback : OnFinishedListener {}
+
+        fun getFlohTweets(listener: GetFlohTweetsCallback)
+        fun loadMoreFlohTweets(remainingUrl: String, listener: LoadMoreFlohTweetsCallback)
     }
 
     interface FlohTweetsPresenter {
