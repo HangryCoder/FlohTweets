@@ -20,7 +20,9 @@ interface FlohContract {
     interface FlohTweets {
 
         interface OnFinishedListener {
-            fun onFinished(twitterAPIResponse: TwitterAPIResponse)
+            fun onSuccess(twitterAPIResponse: TwitterAPIResponse)
+            fun onError(error: Throwable)
+            fun onTerminate()
         }
 
         fun fetchFlohTweets(listener: FlohTweets.OnFinishedListener)
