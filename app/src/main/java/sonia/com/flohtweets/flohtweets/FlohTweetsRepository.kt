@@ -4,6 +4,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import sonia.com.flohtweets.BuildConfig
 import sonia.com.flohtweets.model.TwitterToken
 import sonia.com.flohtweets.network.RestClient
 import sonia.com.flohtweets.utils.Base64Encoding
@@ -37,8 +38,7 @@ class FlohTweetsRepository : FlohContract.FlohTweets {
 
     private fun getAuthToken(): Single<TwitterToken> {
         val encodedKey = Base64Encoding.encodeStringToBase64(
-            key =
-            Constants.CONSUMER_KEY + ":" + Constants.CONSUMER_SECRET
+            key = BuildConfig.ConsumerKey + ":" + BuildConfig.ConsumerSecret
         )
 
         return RestClient.getTweetAPI().getAuthToken(

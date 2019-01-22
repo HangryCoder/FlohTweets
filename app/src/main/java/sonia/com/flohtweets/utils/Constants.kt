@@ -4,10 +4,6 @@ class Constants {
 
     companion object {
 
-        const val CONSUMER_KEY = "tztLEEadXjcpSE45lARLbCqxG"
-
-        const val CONSUMER_SECRET = "udid4ZHelf816gYSCUr1mznlvW4KvIzuxmishGHARUshVjEKwX"
-
         const val ENDLESS_SCROLL_DELAY = 2000L
 
         //Retrofit
@@ -26,7 +22,7 @@ class Constants {
 
         //API Call
 
-        const val TWEET_NAME = "FlohNetwork"
+        const val TWEET_NAME = "TwitterFood"//"FlohNetwork"
 
         const val TWEET_COUNT = 5
 

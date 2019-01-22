@@ -12,6 +12,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.layout_loading.*
+import sonia.com.flohtweets.BuildConfig
 import sonia.com.flohtweets.R
 import sonia.com.flohtweets.network.RestClient
 import sonia.com.flohtweets.adapter.TweetsAdapter
@@ -144,8 +145,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun getAuthToken(): Single<TwitterToken> {
         val encodedKey = Base64Encoding.encodeStringToBase64(
-            key =
-            Constants.CONSUMER_KEY + ":" + Constants.CONSUMER_SECRET
+            key = BuildConfig.ConsumerKey + ":" + BuildConfig.ConsumerSecret
+
         )
 
         return RestClient.getTweetAPI().getAuthToken(
