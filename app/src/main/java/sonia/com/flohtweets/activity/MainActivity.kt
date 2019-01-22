@@ -49,16 +49,15 @@ class MainActivity : AppCompatActivity(), FlohContract.FlohView<FlohTweetsPresen
 
     override fun appendOldFlohTweets(twitterAPIResponse: TwitterAPIResponse) {
         val tweets = twitterAPIResponse.statuses
+        nextResultsUrl = twitterAPIResponse.search_metadata.nextResultUrl
+
+        hideProgressBarAndResetLoadingFlag()
         tweetsAdapter.appendMoreTweets(tweets)
     }
 
     override fun noMoreTweets(error: Throwable) {
         showLogE(TAG, "Error ${error.printStackTrace()}")
         showToast(context = this@MainActivity, message = resources.getString(R.string.no_more_tweets))
-    }
-
-    override fun showPullToRefreshLoader() {
-        swipeRefreshLayout.isRefreshing = true
     }
 
     override fun hidePullToRefreshLoader() {
@@ -150,7 +149,8 @@ class MainActivity : AppCompatActivity(), FlohContract.FlohView<FlohTweetsPresen
                             handler?.postDelayed({
 
                                 if (nextResultsUrl != null && nextResultsUrl.isNotEmpty()) {
-                                    loadMoreFlohTweets(nextResultsUrl)
+                                    //loadMoreFlohTweets(nextResultsUrl)
+                                    presenter.endlessScrolling(nextResultsUrl)
                                 } else {
                                     hideProgressBarAndResetLoadingFlag()
                                     showToast(
@@ -173,7 +173,7 @@ class MainActivity : AppCompatActivity(), FlohContract.FlohView<FlohTweetsPresen
         loading = false
     }
 
-    private fun fetchFlohTweets() {
+   /* private fun fetchFlohTweets() {
         disposable = getAuthToken()
             .flatMap { twitterToken ->
                 return@flatMap RestClient.getTweetAPI().getFlohTweets(
@@ -245,7 +245,7 @@ class MainActivity : AppCompatActivity(), FlohContract.FlohView<FlohTweetsPresen
                 showToast(context = this@MainActivity, message = resources.getString(R.string.no_more_tweets))
             })
     }
-
+*/
     override fun onDestroy() {
         super.onDestroy()
 

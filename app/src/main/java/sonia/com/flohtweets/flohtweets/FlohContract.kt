@@ -12,8 +12,6 @@ interface FlohContract {
 
         fun hideLoader()
 
-        fun showPullToRefreshLoader()
-
         fun hidePullToRefreshLoader()
 
         fun populateFlohTweets(twitterAPIResponse: TwitterAPIResponse)
@@ -33,8 +31,8 @@ interface FlohContract {
             fun onTerminate()
         }
 
-        interface GetFlohTweetsCallback : OnFinishedListener {}
-        interface LoadMoreFlohTweetsCallback : OnFinishedListener {}
+        interface GetFlohTweetsCallback : OnFinishedListener
+        interface LoadMoreFlohTweetsCallback : OnFinishedListener
 
         fun getFlohTweets(listener: GetFlohTweetsCallback)
         fun loadMoreFlohTweets(remainingUrl: String, listener: LoadMoreFlohTweetsCallback)
@@ -44,7 +42,7 @@ interface FlohContract {
 
         fun pullToRefresh()
 
-        fun endlessScrolling()
+        fun endlessScrolling(remainingUrl: String)
 
         fun onDestroy()
     }

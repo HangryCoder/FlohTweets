@@ -25,9 +25,9 @@ class FlohTweetsPresenter(
         })
     }
 
-    override fun endlessScrolling() {
+    override fun endlessScrolling(remainingUrl: String) {
         flohTweetsRepository.loadMoreFlohTweets(
-            remainingUrl = "",
+            remainingUrl = remainingUrl,
             listener = object : FlohContract.FlohTweets.LoadMoreFlohTweetsCallback {
                 override fun onSuccess(twitterAPIResponse: TwitterAPIResponse) {
                     flohTweetView?.appendOldFlohTweets(twitterAPIResponse)
