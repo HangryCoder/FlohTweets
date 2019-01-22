@@ -12,7 +12,15 @@ interface FlohContract {
 
         fun hideLoader()
 
-        fun populateFlohTweets()
+        fun showPullToRefreshLoader()
+
+        fun hidePullToRefreshLoader()
+
+        fun populateFlohTweets(twitterAPIResponse: TwitterAPIResponse)
+
+        fun appendOldFlohTweets(twitterAPIResponse: TwitterAPIResponse)
+
+        fun noMoreTweets(error: Throwable)
 
         fun showErrorMessage(throwable: Throwable)
     }

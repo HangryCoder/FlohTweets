@@ -1,8 +1,6 @@
 package sonia.com.flohtweets.network
 
-import io.reactivex.Observable
 import io.reactivex.Single
-import okhttp3.ResponseBody
 import retrofit2.http.*
 import sonia.com.flohtweets.model.TwitterAPIResponse
 import sonia.com.flohtweets.model.TwitterToken

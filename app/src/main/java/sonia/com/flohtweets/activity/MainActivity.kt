@@ -16,12 +16,62 @@ import sonia.com.flohtweets.BuildConfig
 import sonia.com.flohtweets.R
 import sonia.com.flohtweets.network.RestClient
 import sonia.com.flohtweets.adapter.TweetsAdapter
+import sonia.com.flohtweets.flohtweets.FlohContract
+import sonia.com.flohtweets.flohtweets.FlohTweetsPresenter
+import sonia.com.flohtweets.flohtweets.FlohTweetsRepository
 import sonia.com.flohtweets.model.Statuses
+import sonia.com.flohtweets.model.TwitterAPIResponse
 import sonia.com.flohtweets.model.TwitterToken
 import sonia.com.flohtweets.utils.*
 import kotlin.collections.ArrayList
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), FlohContract.FlohView<FlohTweetsPresenter> {
+
+    override var presenter = FlohTweetsPresenter(this, FlohTweetsRepository())
+
+    override fun showLoader() {
+        loadingLayout.visibility = View.VISIBLE
+    }
+
+    override fun hideLoader() {
+        loadingLayout.visibility = View.INVISIBLE
+    }
+
+    override fun populateFlohTweets(twitterAPIResponse: TwitterAPIResponse) {
+        val tweets = twitterAPIResponse.statuses
+
+        nextResultsUrl = twitterAPIResponse.search_metadata.nextResultUrl
+
+        tweetsAdapter.addAll(tweets)
+
+        swipeRefreshLayout.visibility = View.VISIBLE
+    }
+
+    override fun appendOldFlohTweets(twitterAPIResponse: TwitterAPIResponse) {
+        val tweets = twitterAPIResponse.statuses
+        tweetsAdapter.appendMoreTweets(tweets)
+    }
+
+    override fun noMoreTweets(error: Throwable) {
+        showLogE(TAG, "Error ${error.printStackTrace()}")
+        showToast(context = this@MainActivity, message = resources.getString(R.string.no_more_tweets))
+    }
+
+    override fun showPullToRefreshLoader() {
+        swipeRefreshLayout.isRefreshing = true
+    }
+
+    override fun hidePullToRefreshLoader() {
+        swipeRefreshLayout.isRefreshing = false
+    }
+
+    override fun showErrorMessage(throwable: Throwable) {
+        showLogE(TAG, "Error ${throwable.printStackTrace()}")
+
+        swipeRefreshLayout.visibility = View.INVISIBLE
+        progressBar.visibility = View.INVISIBLE
+        loadingPleaseWaitText.text = resources.getString(R.string.no_internet_connection)
+    }
 
     private val TAG by lazy {
         MainActivity::class.java.simpleName
@@ -51,6 +101,16 @@ class MainActivity : AppCompatActivity() {
 
         handler = Handler()
 
+        setUpTweetsAdapter()
+
+        settingUpPullToRefresh()
+
+        endlessScrolling()
+
+        presenter.pullToRefresh()
+    }
+
+    private fun setUpTweetsAdapter() {
         tweetsAdapter = TweetsAdapter(
             context = this@MainActivity,
             tweetsList = tweetsList
@@ -58,15 +118,13 @@ class MainActivity : AppCompatActivity() {
         tweetsRecyclerView.addItemDecoration(VerticalItemDecoration(10))
 
         tweetsRecyclerView.adapter = tweetsAdapter
+    }
 
+    private fun settingUpPullToRefresh() {
         swipeRefreshLayout.setColorSchemeColors(resources.getColor(R.color.colorPrimary))
         swipeRefreshLayout.setOnRefreshListener {
-            fetchFlohTweets()
+            presenter.pullToRefresh()
         }
-
-        endlessScrolling()
-
-        fetchFlohTweets()
     }
 
     private fun endlessScrolling() {
@@ -160,15 +218,6 @@ class MainActivity : AppCompatActivity() {
         swipeRefreshLayout.visibility = View.VISIBLE
     }
 
-    private fun showErrorMessage(error: Throwable) {
-        showLogE(TAG, "Error ${error.printStackTrace()}")
-
-        swipeRefreshLayout.visibility = View.INVISIBLE
-        loadingLayout.visibility = View.VISIBLE
-        progressBar.visibility = View.INVISIBLE
-        loadingPleaseWaitText.text = resources.getString(R.string.no_internet_connection)
-    }
-
     private fun loadMoreFlohTweets(remainingUrl: String) {
         disposable = getAuthToken()
             .flatMap { twitterToken ->
@@ -200,6 +249,6 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
 
-        disposable?.dispose()
+        presenter.onDestroy()
     }
 }

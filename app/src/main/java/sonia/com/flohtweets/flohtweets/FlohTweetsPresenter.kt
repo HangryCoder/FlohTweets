@@ -10,15 +10,16 @@ class FlohTweetsPresenter(
     override fun pullToRefresh() {
         flohTweetsRepository.getFlohTweets(object : FlohContract.FlohTweets.GetFlohTweetsCallback {
             override fun onSuccess(twitterAPIResponse: TwitterAPIResponse) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                flohTweetView?.populateFlohTweets(twitterAPIResponse)
             }
 
             override fun onError(error: Throwable) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                flohTweetView?.showErrorMessage(error)
             }
 
             override fun onTerminate() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                flohTweetView?.hideLoader()
+                flohTweetView?.hidePullToRefreshLoader()
             }
 
         })
@@ -29,17 +30,16 @@ class FlohTweetsPresenter(
             remainingUrl = "",
             listener = object : FlohContract.FlohTweets.LoadMoreFlohTweetsCallback {
                 override fun onSuccess(twitterAPIResponse: TwitterAPIResponse) {
-                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    flohTweetView?.appendOldFlohTweets(twitterAPIResponse)
                 }
 
                 override fun onError(error: Throwable) {
-                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    flohTweetView?.noMoreTweets(error)
                 }
 
                 override fun onTerminate() {
-                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    flohTweetView?.hideLoader()
                 }
-
             })
     }
 
