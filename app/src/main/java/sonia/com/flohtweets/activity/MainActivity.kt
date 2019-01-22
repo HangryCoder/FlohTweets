@@ -27,59 +27,12 @@ import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(), FlohContract.FlohView<FlohTweetsPresenter> {
 
-    override var presenter = FlohTweetsPresenter(this, FlohTweetsRepository())
-
-    override fun showLoader() {
-        loadingLayout.visibility = View.VISIBLE
-    }
-
-    override fun hideLoader() {
-        loadingLayout.visibility = View.INVISIBLE
-    }
-
-    override fun populateFlohTweets(twitterAPIResponse: TwitterAPIResponse) {
-        val tweets = twitterAPIResponse.statuses
-
-        nextResultsUrl = twitterAPIResponse.search_metadata.nextResultUrl
-
-        tweetsAdapter.addAll(tweets)
-
-        swipeRefreshLayout.visibility = View.VISIBLE
-    }
-
-    override fun appendOldFlohTweets(twitterAPIResponse: TwitterAPIResponse) {
-        val tweets = twitterAPIResponse.statuses
-        nextResultsUrl = twitterAPIResponse.search_metadata.nextResultUrl
-
-        hideProgressBarAndResetLoadingFlag()
-        tweetsAdapter.appendMoreTweets(tweets)
-    }
-
-    override fun noMoreTweets(error: Throwable) {
-        showLogE(TAG, "Error ${error.printStackTrace()}")
-        showToast(context = this@MainActivity, message = resources.getString(R.string.no_more_tweets))
-    }
-
-    override fun hidePullToRefreshLoader() {
-        swipeRefreshLayout.isRefreshing = false
-    }
-
-    override fun showErrorMessage(throwable: Throwable) {
-        showLogE(TAG, "Error ${throwable.printStackTrace()}")
-
-        swipeRefreshLayout.visibility = View.INVISIBLE
-        progressBar.visibility = View.INVISIBLE
-        loadingPleaseWaitText.text = resources.getString(R.string.no_internet_connection)
-    }
-
     private val TAG by lazy {
         MainActivity::class.java.simpleName
     }
 
     private var tweetsList: ArrayList<Statuses?> = ArrayList()
     private lateinit var tweetsAdapter: TweetsAdapter
-
-    private var disposable: Disposable? = null
 
     private var loading = false
     private var pastVisibleItems: Int = 0
@@ -88,7 +41,7 @@ class MainActivity : AppCompatActivity(), FlohContract.FlohView<FlohTweetsPresen
 
     private var handler: Handler? = null
 
-    private var nextResultsUrl = ""
+    override var presenter = FlohTweetsPresenter(this, FlohTweetsRepository())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -141,18 +94,17 @@ class MainActivity : AppCompatActivity(), FlohContract.FlohView<FlohTweetsPresen
                     if (!loading) {
                         if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
                             loading = true
-                            showLogE(TAG, message = "Last Item Wow ! $nextResultsUrl")
+                            showLogE(TAG, message = "Last Item Wow ! ${presenter.nextResultsUrl}")
 
                             tweetsList.add(null)
                             tweetsAdapter.notifyItemInserted(tweetsList.size - 1)
 
                             handler?.postDelayed({
 
-                                if (nextResultsUrl != null && nextResultsUrl.isNotEmpty()) {
-                                    //loadMoreFlohTweets(nextResultsUrl)
-                                    presenter.endlessScrolling(nextResultsUrl)
+                                if (presenter.nextResultsUrl != null && presenter.nextResultsUrl!!.isNotEmpty()) {
+                                    presenter.endlessScrolling()
                                 } else {
-                                    hideProgressBarAndResetLoadingFlag()
+                                    dismissEndlessScrolling()
                                     showToast(
                                         context = this@MainActivity,
                                         message = resources.getString(R.string.no_more_tweets)
@@ -166,86 +118,52 @@ class MainActivity : AppCompatActivity(), FlohContract.FlohView<FlohTweetsPresen
         })
     }
 
-    private fun hideProgressBarAndResetLoadingFlag() {
+    override fun showLoader() {
+        loadingLayout.visibility = View.VISIBLE
+    }
+
+    override fun hideLoader() {
+        loadingLayout.visibility = View.INVISIBLE
+    }
+
+    override fun populateFlohTweets(twitterAPIResponse: TwitterAPIResponse) {
+        val tweets = twitterAPIResponse.statuses
+        tweetsAdapter.addAll(tweets)
+
+        swipeRefreshLayout.visibility = View.VISIBLE
+    }
+
+    override fun appendOldFlohTweets(twitterAPIResponse: TwitterAPIResponse) {
+        val tweets = twitterAPIResponse.statuses
+
+        dismissEndlessScrolling()
+        tweetsAdapter.appendMoreTweets(tweets)
+    }
+
+    override fun dismissEndlessScrolling() {
         //Remove progress item
         tweetsList.removeAt(tweetsList.size - 1)
         tweetsAdapter.notifyItemRemoved(tweetsList.size)
         loading = false
     }
 
-   /* private fun fetchFlohTweets() {
-        disposable = getAuthToken()
-            .flatMap { twitterToken ->
-                return@flatMap RestClient.getTweetAPI().getFlohTweets(
-                    tweetName = Constants.TWEET_NAME,
-                    count = Constants.TWEET_COUNT,
-                    header = "${twitterToken.token_type} ${twitterToken.access_token}",
-                    contentType = Constants.CONTENT_TYPE
-                )
-            }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doAfterTerminate {
-                swipeRefreshLayout.isRefreshing = false
-            }
-            .subscribe({ twitterResponse ->
-                val tweets = twitterResponse.statuses
-
-                nextResultsUrl = twitterResponse.search_metadata.nextResultUrl
-                tweetsAdapter.addAll(tweets)
-
-                showTweetsList()
-
-            }, { error ->
-                showErrorMessage(error)
-            })
+    override fun noMoreTweets(error: Throwable) {
+        showLogE(TAG, "Error ${error.printStackTrace()}")
+        showToast(context = this@MainActivity, message = resources.getString(R.string.no_more_tweets))
     }
 
-    private fun getAuthToken(): Single<TwitterToken> {
-        val encodedKey = Base64Encoding.encodeStringToBase64(
-            key = BuildConfig.ConsumerKey + ":" + BuildConfig.ConsumerSecret
-
-        )
-
-        return RestClient.getTweetAPI().getAuthToken(
-            header = "Basic $encodedKey",
-            grantType = Constants.GRANT_TYPE
-        )
+    override fun hidePullToRefreshLoader() {
+        swipeRefreshLayout.isRefreshing = false
     }
 
-    private fun showTweetsList() {
-        loadingLayout.visibility = View.INVISIBLE
-        swipeRefreshLayout.visibility = View.VISIBLE
+    override fun showErrorMessage(throwable: Throwable) {
+        showLogE(TAG, "Error ${throwable.printStackTrace()}")
+
+        swipeRefreshLayout.visibility = View.INVISIBLE
+        progressBar.visibility = View.INVISIBLE
+        loadingPleaseWaitText.text = resources.getString(R.string.no_internet_connection)
     }
 
-    private fun loadMoreFlohTweets(remainingUrl: String) {
-        disposable = getAuthToken()
-            .flatMap { twitterToken ->
-                return@flatMap RestClient.getTweetAPI().loadMoreFlohTweets(
-                    url = Constants.TWEETS_API + remainingUrl,
-                    header = "${twitterToken.token_type} ${twitterToken.access_token}",
-                    contentType = Constants.CONTENT_TYPE
-                )
-            }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ twitterResponse ->
-
-                val tweets = twitterResponse.statuses
-
-                nextResultsUrl = twitterResponse.search_metadata.nextResultUrl
-
-                hideProgressBarAndResetLoadingFlag()
-                tweetsAdapter.appendMoreTweets(tweets)
-
-
-            }, { error ->
-                showLogE(TAG, "Error ${error.printStackTrace()}")
-                hideProgressBarAndResetLoadingFlag()
-                showToast(context = this@MainActivity, message = resources.getString(R.string.no_more_tweets))
-            })
-    }
-*/
     override fun onDestroy() {
         super.onDestroy()
 

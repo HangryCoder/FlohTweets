@@ -20,6 +20,8 @@ interface FlohContract {
 
         fun noMoreTweets(error: Throwable)
 
+        fun dismissEndlessScrolling()
+
         fun showErrorMessage(throwable: Throwable)
     }
 
@@ -42,7 +44,7 @@ interface FlohContract {
 
         fun pullToRefresh()
 
-        fun endlessScrolling(remainingUrl: String)
+        fun endlessScrolling()
 
         fun onDestroy()
     }
