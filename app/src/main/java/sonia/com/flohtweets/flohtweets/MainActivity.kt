@@ -1,4 +1,4 @@
-package sonia.com.flohtweets.activity
+package sonia.com.flohtweets.flohtweets
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -6,22 +6,12 @@ import android.os.Handler
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.layout_loading.*
-import sonia.com.flohtweets.BuildConfig
 import sonia.com.flohtweets.R
-import sonia.com.flohtweets.network.RestClient
 import sonia.com.flohtweets.adapter.TweetsAdapter
-import sonia.com.flohtweets.flohtweets.FlohContract
-import sonia.com.flohtweets.flohtweets.FlohTweetsPresenter
-import sonia.com.flohtweets.flohtweets.FlohTweetsRepository
 import sonia.com.flohtweets.model.Statuses
 import sonia.com.flohtweets.model.TwitterAPIResponse
-import sonia.com.flohtweets.model.TwitterToken
 import sonia.com.flohtweets.utils.*
 import kotlin.collections.ArrayList
 
